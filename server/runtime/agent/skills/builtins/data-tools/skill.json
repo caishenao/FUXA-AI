@@ -1,0 +1,9 @@
+{
+    "name": "数据分析工具",
+    "slug": "data-tools",
+    "version": "1.0.0",
+    "kind": "tool-pack",
+    "main": "index.js",
+    "description": "趋势查询、统计分析、数据对比、异常检测",
+    "author": "frangoteam"
+}
