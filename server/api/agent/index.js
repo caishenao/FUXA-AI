@@ -155,6 +155,136 @@ module.exports = {
             }
         });
 
+        // ---- Market (admin-only) ----
+
+        app.get('/api/agent/skills/market', secureFnc, function (req, res) {
+            if (!requireAdmin(req, res)) return;
+            try {
+                const mgr = runtime.agentMgr.getSkillManager();
+                const catalog = mgr.getCatalog();
+                const installed = new Set(mgr.list().map(s => s.slug));
+
+                const items = catalog.list().map(e => ({
+                    slug: e.slug,
+                    name: e.name,
+                    version: e.version,
+                    kind: e.kind,
+                    description: e.description,
+                    author: e.author,
+                    source: 'builtin',
+                    installed: installed.has(e.slug),
+                    enabled: false
+                }));
+
+                const installedMap = {};
+                for (const s of mgr.list()) installedMap[s.slug] = s;
+                for (const item of items) {
+                    if (installedMap[item.slug]) {
+                        item.installed = true;
+                        item.enabled = installedMap[item.slug].enabled;
+                    }
+                }
+
+                res.json(items);
+            } catch (err) {
+                res.status(500).json({ error: 'skills_market', message: String(err) });
+            }
+        });
+
+        app.get('/api/agent/skills/search', secureFnc, async function (req, res) {
+            if (!requireAdmin(req, res)) return;
+            const query = (req.query.q || '').trim();
+            const source = req.query.source || 'all';
+            if (!query) return res.json([]);
+
+            try {
+                const mgr = runtime.agentMgr.getSkillManager();
+                const catalog = mgr.getCatalog();
+                const installed = new Set(mgr.list().map(s => s.slug));
+                const results = [];
+
+                if (source === 'all' || source === 'builtin') {
+                    for (const e of catalog.search(query)) {
+                        results.push({
+                            slug: e.slug, name: e.name, version: e.version,
+                            kind: e.kind, description: e.description, author: e.author,
+                            source: 'builtin', installed: installed.has(e.slug), enabled: false
+                        });
+                    }
+                }
+
+                if (source === 'all' || source === 'skills-sh') {
+                    const reg = mgr.getRemoteRegistry();
+                    if (reg?.available) {
+                        const remote = await reg.search(query);
+                        for (const r of remote) {
+                            results.push({
+                                ...r,
+                                installed: installed.has(r.slug),
+                                enabled: false
+                            });
+                        }
+                    }
+                }
+
+                res.json(results);
+            } catch (err) {
+                res.status(500).json({ error: 'skills_search', message: String(err) });
+            }
+        });
+
+        app.post('/api/agent/skills/install-by-slug', secureFnc, async function (req, res) {
+            if (!requireAdmin(req, res)) return;
+            const { slug, source } = req.body || {};
+            if (!slug) return res.status(400).json({ error: 'missing_slug' });
+
+            try {
+                const mgr = runtime.agentMgr.getSkillManager();
+
+                if (source === 'builtin' || !source) {
+                    const dir = mgr.getCatalog().getInstallDir(slug);
+                    if (!dir) return res.status(404).json({ error: 'builtin_not_found', slug });
+                    const out = await mgr.installFromDir(dir);
+                    return res.json(out);
+                }
+
+                if (source === 'skills-sh') {
+                    const reg = mgr.getRemoteRegistry();
+                    if (!reg?.available) {
+                        return res.status(400).json({ error: 'skills_sh_not_configured', message: 'skills.sh API key not set' });
+                    }
+                    const detail = await reg.search(slug);
+                    if (!detail || !detail.length) {
+                        return res.status(404).json({ error: 'remote_not_found', slug });
+                    }
+                    return res.json({ ok: false, message: 'skills-sh download not yet implemented', skill: detail[0] });
+                }
+
+                res.status(400).json({ error: 'unknown_source', source });
+            } catch (err) {
+                runtime.logger?.error?.('agent.skills.install-by-slug: ' + err.message);
+                res.status(400).json({ error: 'install_failed', message: String(err.message || err) });
+            }
+        });
+
+        app.get('/api/agent/skills/:slug/detail', secureFnc, function (req, res) {
+            if (!requireAdmin(req, res)) return;
+            try {
+                const mgr = runtime.agentMgr.getSkillManager();
+                const list = mgr.list();
+                const skill = list.find(s => s.slug === req.params.slug);
+                if (!skill) {
+                    const catalog = mgr.getCatalog();
+                    const entry = catalog.list().find(e => e.slug === req.params.slug);
+                    if (entry) return res.json({ ...entry, installed: false, source: 'builtin' });
+                    return res.status(404).json({ error: 'not_found' });
+                }
+                res.json(skill);
+            } catch (err) {
+                res.status(500).json({ error: 'skill_detail', message: String(err) });
+            }
+        });
+
         // ---- Sessions & Messages (editor / admin) ----
 
         // POST one-shot turn against the active view.
