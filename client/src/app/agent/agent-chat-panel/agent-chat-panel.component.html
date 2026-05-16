@@ -17,13 +17,20 @@
             描述你想要的组态界面，例如：<br>
             「做一个污水处理厂总览，左上角液位，右侧 4 台水泵状态」
         </div>
-        <div *ngFor="let m of messages" class="msg" [class.user]="m.role==='user'"
-             [class.assistant]="m.role==='assistant'" [class.tool]="m.role==='tool'"
+        <div *ngFor="let m of messages" class="msg"
+             [class.user]="m.role==='user'"
+             [class.assistant]="m.role==='assistant' && !m.thinking"
+             [class.thinking]="m.role==='assistant' && m.thinking"
+             [class.tool]="m.role==='tool'"
              [class.system]="m.role==='system'">
             <button class="copy-btn" (click)="copyMessage(m)" [title]="copiedId===m.id ? '已复制' : '复制'">
                 {{ copiedId===m.id ? '✓' : '⧉' }}
             </button>
-            <div class="role">{{ m.role }}</div>
+            <div class="role" *ngIf="m.role==='user'">用户</div>
+            <div class="role" *ngIf="m.role==='assistant' && !m.thinking">回复</div>
+            <div class="role" *ngIf="m.role==='assistant' && m.thinking">思考</div>
+            <div class="role" *ngIf="m.role==='tool'">工具</div>
+            <div class="role" *ngIf="m.role==='system'">系统</div>
             <div *ngIf="m.attachments?.length" class="attachments">
                 <img *ngFor="let a of m.attachments" [src]="a.dataUrl" [alt]="a.name">
             </div>

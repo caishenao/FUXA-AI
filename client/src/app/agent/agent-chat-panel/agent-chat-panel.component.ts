@@ -30,6 +30,8 @@ export class AgentChatPanelComponent implements OnInit, OnDestroy {
 
     private destroy$ = new Subject<void>();
     private pendingAssistantId: string | null = null;
+    private loopThinkingId: string | null = null;
+    private hasIntermediateText = false;
 
     constructor(private agent: AgentService, private projectService: ProjectService, private cdr: ChangeDetectorRef) {}
 
@@ -54,13 +56,30 @@ export class AgentChatPanelComponent implements OnInit, OnDestroy {
         });
 
         this.agent.done$.pipe(takeUntil(this.destroy$)).subscribe(done => {
-            if (this.pendingAssistantId) {
+            if (this.hasIntermediateText) {
+                // We showed thinking steps — add final reply as a separate message.
+                if (done.text) {
+                    this.agent.pushMessage({
+                        id: `m${++_id}`,
+                        role: 'assistant',
+                        text: done.text,
+                        createdAt: Date.now()
+                    });
+                }
+                // Remove any leftover pending placeholder.
+                if (this.pendingAssistantId) {
+                    this.agent.updateMessage(this.pendingAssistantId, { pending: false });
+                }
+            } else if (this.pendingAssistantId) {
+                // No intermediate text — update the pending placeholder with the reply.
                 this.agent.updateMessage(this.pendingAssistantId, {
                     pending: false,
                     text: done.text || ''
                 });
-                this.pendingAssistantId = null;
             }
+            this.pendingAssistantId = null;
+            this.loopThinkingId = null;
+            this.hasIntermediateText = false;
             if (done.committed?.ok) {
                 this.undoAvailable = true;
                 try { this.projectService.reload(); } catch (_) { /* defensive */ }
@@ -149,6 +168,8 @@ export class AgentChatPanelComponent implements OnInit, OnDestroy {
         this.error = null;
         this.undoAvailable = false;
         this.pendingAssistantId = null;
+        this.loopThinkingId = null;
+        this.hasIntermediateText = false;
         // Also clear server-side session history.
         this.agent.clearSessionHistory().subscribe({ error: () => {} });
     }
@@ -195,6 +216,8 @@ export class AgentChatPanelComponent implements OnInit, OnDestroy {
 
         const pendingId = `m${++_id}`;
         this.pendingAssistantId = pendingId;
+        this.loopThinkingId = null;
+        this.hasIntermediateText = false;
         this.agent.pushMessage({
             id: pendingId,
             role: 'assistant',
@@ -215,14 +238,20 @@ export class AgentChatPanelComponent implements OnInit, OnDestroy {
                 }
                 // If streaming events didn't handle the response, update here.
                 if (this.pendingAssistantId === pendingId) {
-                    this.agent.updateMessage(pendingId, {
-                        pending: false,
-                        text: result.text,
-                        toolCalls: undefined
-                    });
+                    // Show intermediate thinking + tool calls from trace.
+                    let showedThinking = false;
                     if (result.trace) {
                         for (const step of result.trace) {
-                            if (step.kind === 'tool') {
+                            if (step.kind === 'assistant' && step.text) {
+                                showedThinking = true;
+                                this.agent.pushMessage({
+                                    id: `m${++_id}`,
+                                    role: 'assistant',
+                                    thinking: true,
+                                    text: step.text,
+                                    createdAt: Date.now()
+                                });
+                            } else if (step.kind === 'tool') {
                                 this.agent.pushMessage({
                                     id: `m${++_id}`,
                                     role: 'tool',
@@ -232,6 +261,24 @@ export class AgentChatPanelComponent implements OnInit, OnDestroy {
                                 });
                             }
                         }
+                    }
+                    // Final reply — update placeholder or add separate message.
+                    if (showedThinking) {
+                        this.agent.updateMessage(pendingId, { pending: false });
+                        if (result.text) {
+                            this.agent.pushMessage({
+                                id: `m${++_id}`,
+                                role: 'assistant',
+                                text: result.text,
+                                createdAt: Date.now()
+                            });
+                        }
+                    } else {
+                        this.agent.updateMessage(pendingId, {
+                            pending: false,
+                            text: result.text,
+                            toolCalls: undefined
+                        });
                     }
                     if (result.committed?.ok) {
                         this.undoAvailable = true;
@@ -279,8 +326,33 @@ export class AgentChatPanelComponent implements OnInit, OnDestroy {
     }
 
     private _handleStreamChunk(chunk: AgentStreamChunk): void {
-        if (chunk.kind === 'tool') {
-            // Tool call result — push a tool message.
+        if (chunk.kind === 'text' && chunk.delta) {
+            // Intermediate thinking text from the model (per loop iteration).
+            // If we already have a thinking message for this loop, update it;
+            // otherwise create a new one (this is a new loop iteration's thought).
+            if (this.loopThinkingId) {
+                this.agent.updateMessage(this.loopThinkingId, { text: chunk.delta });
+            } else {
+                // If there's a pending assistant placeholder, convert it to thinking.
+                if (this.pendingAssistantId && !this.hasIntermediateText) {
+                    this.loopThinkingId = this.pendingAssistantId;
+                    this.agent.updateMessage(this.loopThinkingId, {
+                        pending: false, thinking: true, text: chunk.delta
+                    });
+                    this.hasIntermediateText = true;
+                } else {
+                    const tid = `m${++_id}`;
+                    this.loopThinkingId = tid;
+                    this.agent.pushMessage({
+                        id: tid, role: 'assistant', thinking: true,
+                        text: chunk.delta, createdAt: Date.now()
+                    });
+                    this.hasIntermediateText = true;
+                }
+            }
+        } else if (chunk.kind === 'tool') {
+            // Reset thinking tracker for next loop iteration.
+            this.loopThinkingId = null;
             this.agent.pushMessage({
                 id: `m${++_id}`,
                 role: 'tool',
@@ -289,9 +361,6 @@ export class AgentChatPanelComponent implements OnInit, OnDestroy {
                 createdAt: Date.now()
             });
         }
-        // Text chunks from streaming are accumulated by the server; we show the
-        // final text on agent:done. For progressive display we could append deltas
-        // to the pending assistant message here — deferred for now.
         this.cdr.markForCheck();
         this._scrollToBottom();
     }

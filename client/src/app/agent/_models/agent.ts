@@ -51,6 +51,8 @@ export interface AgentMessage {
     /** Image attachments from the user. */
     attachments?: AgentAttachment[];
     pending?: boolean;
+    /** Intermediate thinking/reasoning from the model loop. */
+    thinking?: boolean;
     error?: string;
     createdAt: number;
 }
