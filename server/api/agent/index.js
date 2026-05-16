@@ -200,15 +200,18 @@ module.exports = {
             try {
                 const mgr = runtime.agentMgr.getSkillManager();
                 const catalog = mgr.getCatalog();
-                const installed = new Set(mgr.list().map(s => s.slug));
                 const results = [];
+
+                const installedMap = {};
+                for (const s of mgr.list()) installedMap[s.slug] = s;
 
                 if (source === 'all' || source === 'builtin') {
                     for (const e of catalog.search(query)) {
+                        const inst = installedMap[e.slug];
                         results.push({
                             slug: e.slug, name: e.name, version: e.version,
                             kind: e.kind, description: e.description, author: e.author,
-                            source: 'builtin', installed: installed.has(e.slug), enabled: false
+                            source: 'builtin', installed: !!inst, enabled: inst ? inst.enabled : false
                         });
                     }
                 }
@@ -218,10 +221,11 @@ module.exports = {
                     if (reg?.available) {
                         const remote = await reg.search(query);
                         for (const r of remote) {
+                            const inst = installedMap[r.slug];
                             results.push({
                                 ...r,
-                                installed: installed.has(r.slug),
-                                enabled: false
+                                installed: !!inst,
+                                enabled: inst ? inst.enabled : false
                             });
                         }
                     }
