@@ -164,6 +164,15 @@ function buildSvg(type, x, y, w, h, fill, stroke, fontSize, text, options) {
                     `<rect id="${id}" width="${w}" height="${h}" fill="none"/>` +
                     `</g>` };
             }
+            if (type === 'svg-ext-svg') {
+                // Hand-drawn custom SVG: options.svg contains raw SVG inner content (paths, circles, etc.)
+                const inner = (options && options.svg) || '';
+                return { id, svg:
+                    `<g id="${id}" type="svg-ext-svg" fill="${f}" stroke="${s}" font-size="${fs}" font-family="sans-serif" stroke-width="1" transform="translate(${x},${y})" xml:space="preserve">` +
+                    `<rect id="${id}" width="${w}" height="${h}" fill="none" stroke="rgba(0,0,0,0)" stroke-width="0"/>` +
+                    inner +
+                    `</g>` };
+            }
             return { id, svg: '' };
         }
     }
@@ -237,7 +246,9 @@ const GAUGE_TYPES = [
     // General shapes (SVG drawing)
     'svg-ext-rect', 'svg-ext-ellipse', 'svg-ext-text', 'svg-ext-line',
     // Shape library
-    'svg-ext-shapes', 'svg-ext-proceng', 'svg-ext-ape'
+    'svg-ext-shapes', 'svg-ext-proceng', 'svg-ext-ape',
+    // Custom hand-drawn SVG
+    'svg-ext-svg'
 ];
 
 // Map agent type -> SVG type attribute used by the frontend
@@ -434,13 +445,14 @@ function descriptors() {
                     },
                     options: {
                         type: 'object',
-                        description: 'Type-specific options. shapeName for svg-ext-shapes (rectangle, circle, diamond, triangle, pentagon, star, arrow, cloud, cylinder, heart, etc.) or svg-ext-proceng (centrifugal, motor, valveax, tank1, exchheat, compfan, nozzle, etc.) or svg-ext-ape (eli, piston). pipeWidth/contentWidth/content/border for pipe.',
+                        description: 'Type-specific options. shapeName for svg-ext-shapes/proceng/ape. pipeWidth/contentWidth/content/border for pipe. svg (raw SVG inner content) for svg-ext-svg — place <path>, <circle>, <polygon>, <text> etc. directly.',
                         properties: {
                             shapeName: { type: 'string', description: 'Shape subtype name (e.g. "rectangle", "centrifugal", "piston").' },
                             pipeWidth: { type: 'number' },
                             contentWidth: { type: 'number' },
                             content: { type: 'string' },
-                            border: { type: 'string' }
+                            border: { type: 'string' },
+                            svg: { type: 'string', description: 'Raw SVG inner content for type=svg-ext-svg. E.g. "<circle cx=25 cy=25 r=20/> <line x1=10 y1=25 x2=40 y2=25/>".' }
                         }
                     }
                 }
