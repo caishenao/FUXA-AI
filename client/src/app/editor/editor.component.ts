@@ -43,6 +43,8 @@ import { ResourcesService } from '../_services/resources.service';
 import { InputPropertyComponent } from '../gauges/controls/html-input/input-property/input-property.component';
 import { SettingsService } from '../_services/settings.service';
 import { OnboardingWizardComponent } from './onboarding-wizard/onboarding-wizard.component';
+import { AgentService } from '../agent/_services/agent.service';
+import { DesignImportDialogComponent } from './design-import-dialog/design-import-dialog.component';
 
 declare var Gauge: any;
 
@@ -136,7 +138,8 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
         private resolver: ComponentFactoryResolver,
         private resourcesService: ResourcesService,
         private libWidgetsService: LibWidgetsService,
-        private settingsService: SettingsService) {
+        private settingsService: SettingsService,
+        private agentService: AgentService) {
     }
 
     //#region Implemented onInit / onAfterInit event
@@ -684,6 +687,12 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.sidePanel.opened) {
             this.sidePanel.toggle();
         }
+        try {
+            const ids = (elems || []).map((e: any) => e?.id).filter((x: any) => !!x);
+            if (this.currentView) {
+                this.agentService.setSelection(ids.length ? { ids, viewId: this.currentView.id } : null);
+            }
+        } catch (_) { /* defensive */ }
     }
 
     /**
@@ -900,6 +909,29 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
                 reader.readAsDataURL(event.target.files[0]);
             }
         }
+    }
+
+    /**
+     * Open design import dialog for PNG/JPG/PEN files
+     */
+    onImportDesign() {
+        const dialogRef = this.dialog.open(DesignImportDialogComponent, {
+            width: '520px',
+            panelClass: 'dark-dialog'
+        });
+        dialogRef.afterClosed().subscribe(result => {
+            if (!result) return;
+            if (result.type === 'image') {
+                this.ctrlInitParams = result.location;
+                this.setMode('own_ctrl-image');
+            } else if (result.type === 'pen' && this.currentView?.id) {
+                this.agentService.sendMessage(
+                    `Import this Pencil design from file "${result.fileId}", page ${result.pageIndex + 1}. ` +
+                    `Use design_parse_pen to parse it, then design_place_elements to place all elements on the canvas.`,
+                    []
+                ).subscribe();
+            }
+        });
     }
 
     /**
@@ -1128,6 +1160,7 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
             this.saveView(this.currentView);
         }
         this.currentView = view;
+        try { this.agentService.setActiveView(this.currentView?.id || null); } catch (_) {}
         if (this.currentView.type === ViewType.cards) {
             this.editorMode = EditorModeType.CARDS;
         } else if (this.currentView.type === ViewType.maps) {

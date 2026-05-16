@@ -1,0 +1,30 @@
+<h2 mat-dialog-title>Import Design</h2>
+<mat-dialog-content>
+    <div class="file-picker" *ngIf="!importResult">
+        <input type="file" accept=".png,.jpg,.jpeg,.pen" (change)="onFileSelected($event)">
+        <p class="hint">Supports PNG, JPG (from Figma export) and .pen (Pencil) files</p>
+    </div>
+
+    <div class="preview" *ngIf="previewUrl && fileType !== 'pen'">
+        <img [src]="previewUrl" alt="preview">
+    </div>
+
+    <div class="pen-pages" *ngIf="importResult && importResult.pages?.length">
+        <h4>Select a page to import:</h4>
+        <div class="page-item" *ngFor="let page of importResult.pages; let i = index"
+             [class.selected]="selectedPage === i" (click)="selectedPage = i">
+            <span class="page-name">{{ page.name }}</span>
+            <span class="page-meta">{{ page.width }}x{{ page.height }} &middot; {{ page.elementCount }} elements</span>
+        </div>
+    </div>
+
+    <div class="error" *ngIf="error">{{ error }}</div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()">Cancel</button>
+    <button mat-raised-button color="primary" *ngIf="!importResult" (click)="upload()"
+            [disabled]="!file || busy">{{ busy ? 'Uploading...' : 'Upload' }}</button>
+    <button mat-raised-button color="primary" *ngIf="importResult?.pages?.length" (click)="importPage()">
+        Import Page {{ selectedPage + 1 }}
+    </button>
+</mat-dialog-actions>

@@ -15,10 +15,11 @@
 const viewTools = require('./tools/view');
 const deviceTools = require('./tools/device');
 const projectTools = require('./tools/project');
+const designImportTools = require('./tools/design-import');
 
 const MODE_TOOLS = {
-    web: [viewTools, deviceTools, projectTools],
-    cli: [viewTools, deviceTools, projectTools]
+    web: [viewTools, deviceTools, projectTools, designImportTools],
+    cli: [viewTools, deviceTools, projectTools, designImportTools]
 };
 
 function _skillPacks(ctx) {

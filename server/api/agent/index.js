@@ -3,6 +3,8 @@
  */
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const express = require('express');
 const authJwt = require('../jwt-helper');
 
@@ -286,6 +288,57 @@ module.exports = {
                 res.json(skill);
             } catch (err) {
                 res.status(500).json({ error: 'skill_detail', message: String(err) });
+            }
+        });
+
+        // POST /api/agent/design-import — upload a design file for agent processing
+        app.post('/api/agent/design-import', secureFnc, async function (req, res) {
+            if (!requireEditorOrAdmin(req, res)) return;
+            const { fileName, data } = req.body || {};
+            if (!fileName || !data) {
+                return res.status(400).json({ error: 'missing_params', message: 'fileName and data (base64) are required' });
+            }
+
+            const ext = fileName.split('.').pop().toLowerCase();
+            const allowed = ['png', 'jpg', 'jpeg', 'pen'];
+            if (!allowed.includes(ext)) {
+                return res.status(400).json({ error: 'unsupported_type', message: 'Only PNG, JPG, and .pen files are supported' });
+            }
+
+            try {
+                const uploadDir = runtime.settings.uploadFileDir || '';
+                const safeName = Date.now().toString(36) + '_' + fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+                const fullPath = path.join(uploadDir, safeName);
+
+                const base64 = data.replace(/^data:[^;]+;base64,/, '');
+                const buf = Buffer.from(base64, 'base64');
+                fs.writeFileSync(fullPath, buf);
+
+                const result = {
+                    fileId: safeName,
+                    fileName,
+                    fileSize: buf.length,
+                    mimeType: ext === 'pen' ? 'application/x-pencil' : 'image/' + ext,
+                    location: '/' + (runtime.settings.httpUploadFileStatic || 'uploadfiles') + '/' + safeName
+                };
+
+                if (ext === 'pen') {
+                    try {
+                        const penParser = require('../../runtime/agent/pen-parser');
+                        const parsed = penParser.parsePen(buf);
+                        result.pages = parsed.pages.map(p => ({
+                            name: p.name, width: p.width, height: p.height,
+                            elementCount: p.elements.length
+                        }));
+                    } catch (parseErr) {
+                        result.parseError = String(parseErr.message);
+                    }
+                }
+
+                res.json(result);
+            } catch (err) {
+                runtime.logger?.error?.('agent.design-import: ' + err.message);
+                res.status(500).json({ error: 'import_failed', message: String(err.message || err) });
             }
         });
 

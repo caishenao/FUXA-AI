@@ -11,7 +11,8 @@ import {
     AgentTestResult,
     AgentTurnResult,
     AgentAttachment,
-    AgentSkillMarketItem
+    AgentSkillMarketItem,
+    DesignImportResult
 } from '../_models/agent';
 
 export interface AgentStreamChunk {
@@ -244,5 +245,14 @@ export class AgentService implements OnDestroy {
 
     installBySlug(slug: string, source: string = 'builtin'): Observable<AgentSkill> {
         return this.http.post<AgentSkill>(`${this.base}/api/agent/skills/install-by-slug`, { slug, source });
+    }
+
+    // ---- Design Import ----
+
+    uploadDesignFile(fileName: string, data: string): Observable<DesignImportResult> {
+        return this.http.post<DesignImportResult>(
+            `${this.base}/api/agent/design-import`,
+            { fileName, data }
+        );
     }
 }

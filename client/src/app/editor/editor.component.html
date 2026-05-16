@@ -114,6 +114,9 @@
                                 <span class="icon-image"></span>
                                 <input #imagefile type="file" style="display: none;" (change)="onSetImage($event)" accept="image/png|jpg|svg" />
                             </div>
+                            <div class="svg-tool-button" matTooltip="Import Design (PNG/JPG/PEN)" (click)="onImportDesign()">
+                                <span class="icon-image"></span>
+                            </div>
                             <div id="tool_line" style="display: none;">
                                 <span class="icon-image"></span>
                             </div>
@@ -1127,3 +1130,5 @@
     <!-- layers context menu END -->
     <div #svgpreview class="svg-preview"></div>
 </div>
+
+<app-agent-chat-panel></app-agent-chat-panel>

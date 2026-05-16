@@ -405,6 +405,17 @@ class Orchestrator {
             if (instr) parts.push('\n--- SKILL INSTRUCTIONS ---\n' + instr);
         }
 
+        // Design import tools info
+        parts.push(
+            'Design import tools: design_parse_pen (parse .pen files), ' +
+            'design_place_elements (batch-place elements on canvas), ' +
+            'design_set_background (set background image). ' +
+            'For PNG/JPG: analyze the image then use view_add_gauge to recreate the layout. ' +
+            'Map design types to FUXA: rect->svg-ext-rect, ellipse->svg-ext-ellipse, ' +
+            'text->svg-ext-text, line->svg-ext-line, button->html-button, value->value. ' +
+            'Always call view_save after placing elements.'
+        );
+
         const sys = parts.filter(Boolean).join('\n');
 
         const userParts = [];

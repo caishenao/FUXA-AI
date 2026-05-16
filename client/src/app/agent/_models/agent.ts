@@ -105,3 +105,13 @@ export interface AgentSkillMarketItem {
     installed: boolean;
     enabled: boolean;
 }
+
+export interface DesignImportResult {
+    fileId: string;
+    fileName: string;
+    fileSize: number;
+    mimeType: string;
+    location: string;
+    pages?: { name: string; width: number; height: number; elementCount: number }[];
+    parseError?: string;
+}

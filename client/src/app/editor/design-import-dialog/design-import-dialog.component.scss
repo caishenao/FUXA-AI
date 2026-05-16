@@ -1,0 +1,24 @@
+.file-picker {
+    padding: 16px;
+    input { width: 100%; }
+    .hint { color: #888; font-size: 12px; margin-top: 8px; }
+}
+.preview {
+    margin-top: 12px;
+    max-height: 300px; overflow: auto;
+    img { max-width: 100%; border: 1px solid #333; border-radius: 4px; }
+}
+.pen-pages {
+    h4 { margin: 8px 0; font-size: 13px; color: #ccc; }
+    .page-item {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 8px 12px; margin: 4px 0;
+        background: #2a2a2a; border: 1px solid #444; border-radius: 4px;
+        cursor: pointer;
+        &:hover { border-color: #1976d2; }
+        &.selected { border-color: #1976d2; background: #1a237e; }
+        .page-name { color: #fff; font-size: 13px; }
+        .page-meta { color: #888; font-size: 11px; }
+    }
+}
+.error { color: #f08; font-size: 12px; margin-top: 8px; }
