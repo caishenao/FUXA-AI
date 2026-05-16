@@ -1,0 +1,9 @@
+{
+    "name": "UI 辅助工具",
+    "slug": "ui-helpers",
+    "version": "1.0.0",
+    "kind": "tool-pack",
+    "main": "index.js",
+    "description": "布局对齐、均匀分布、尺寸统一、样式复制、网格吸附、批量重命名",
+    "author": "frangoteam"
+}
