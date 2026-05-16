@@ -189,7 +189,7 @@ class Orchestrator {
                 break;
             }
             // Push assistant message into history exactly as needed by the model.
-            messages.push({
+            const assistantMsg = {
                 role: 'assistant',
                 content: resp.text || null,
                 tool_calls: resp.toolCalls.map(tc => ({
@@ -197,7 +197,10 @@ class Orchestrator {
                     type: 'function',
                     function: { name: tc.name, arguments: JSON.stringify(tc.args) }
                 }))
-            });
+            };
+            // Preserve reasoning_content for APIs that require it (e.g. Xiaomi Mimo thinking mode).
+            if (resp.reasoningContent) assistantMsg.reasoning_content = resp.reasoningContent;
+            messages.push(assistantMsg);
 
             for (const call of resp.toolCalls) {
                 const result = await this._runOne(call, tools, exec);
