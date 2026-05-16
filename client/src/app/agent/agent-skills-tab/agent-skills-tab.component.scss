@@ -1,0 +1,162 @@
+.agent-skills {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+    color: #ddd;
+    font-size: 12px;
+
+    .header {
+        display: flex;
+        gap: 8px;
+        button {
+            padding: 4px 10px;
+            cursor: pointer;
+            background: #2a2a2a;
+            color: #ddd;
+            border: 1px solid #444;
+            border-radius: 3px;
+        }
+        button.primary { background: #1976d2; color: #fff; border-color: #1976d2; }
+        button[disabled] { opacity: 0.5; cursor: default; }
+    }
+    .error { color: #f08; }
+    .info { color: #4c8; }
+    .empty { color: #888; font-style: italic; padding: 12px; text-align: center; }
+
+    .skill {
+        background: #1f1f1f;
+        border: 1px solid #333;
+        border-radius: 4px;
+        padding: 8px;
+
+        .row1 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            .name { font-weight: 600; color: #fff; }
+            .version { color: #888; font-size: 11px; }
+            .kind {
+                font-size: 11px; color: #aaa;
+                background: #2a2a2a; padding: 1px 6px; border-radius: 8px;
+            }
+            .badge {
+                font-size: 11px; margin-left: auto;
+                padding: 1px 6px; border-radius: 8px;
+                &.on { background: #2c5; color: #062; }
+                &.off { background: #444; color: #aaa; }
+            }
+        }
+        .row2 { color: #aaa; margin-top: 4px; }
+        .row2.err { color: #f08; }
+        .actions {
+            display: flex; gap: 6px; margin-top: 6px;
+            button {
+                padding: 3px 8px; font-size: 11px;
+                background: #2a2a2a; color: #ddd; border: 1px solid #444;
+                border-radius: 3px; cursor: pointer;
+                &.danger { color: #f55; border-color: #633; }
+                &[disabled] { opacity: 0.5; cursor: default; }
+            }
+        }
+    }
+
+    .section-title {
+        font-size: 12px;
+        color: #888;
+        padding: 8px 0 4px;
+        border-top: 1px solid #333;
+        margin-top: 4px;
+    }
+
+    .market {
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 4px;
+        padding: 8px;
+
+        .search-bar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+            input {
+                flex: 1;
+                padding: 4px 8px;
+                background: #2a2a2a;
+                color: #ddd;
+                border: 1px solid #444;
+                border-radius: 3px;
+                font-size: 12px;
+                outline: none;
+                &:focus { border-color: #1976d2; }
+            }
+            button {
+                padding: 4px 10px;
+                background: #1976d2;
+                color: #fff;
+                border: 1px solid #1976d2;
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 12px;
+            }
+        }
+
+        .source-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 8px;
+            button {
+                padding: 2px 8px;
+                background: #2a2a2a;
+                color: #aaa;
+                border: 1px solid #444;
+                border-radius: 10px;
+                font-size: 11px;
+                cursor: pointer;
+                &.active { background: #1976d2; color: #fff; border-color: #1976d2; }
+            }
+        }
+
+        .market-loading {
+            color: #888;
+            font-style: italic;
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .market-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .market-item {
+            background: #252525;
+            border: 1px solid #383838;
+            border-radius: 3px;
+            padding: 6px 8px;
+
+            .info-row {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                .name { font-weight: 600; color: #fff; font-size: 12px; }
+                .version { color: #888; font-size: 10px; }
+                .kind { font-size: 10px; color: #aaa; background: #2a2a2a; padding: 1px 5px; border-radius: 8px; }
+                .source-tag { font-size: 10px; color: #7986cb; background: #1a237e; padding: 1px 5px; border-radius: 8px; }
+            }
+            .desc { color: #999; font-size: 11px; margin-top: 3px; }
+            .actions {
+                margin-top: 4px;
+                button {
+                    padding: 2px 8px; font-size: 11px;
+                    background: #2a2a2a; color: #ddd; border: 1px solid #444;
+                    border-radius: 3px; cursor: pointer;
+                    &.primary { background: #1976d2; color: #fff; border-color: #1976d2; }
+                }
+                .installed-badge { font-size: 10px; color: #4c8; }
+            }
+        }
+    }
+}

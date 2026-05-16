@@ -1,0 +1,68 @@
+<div class="agent-skills">
+    <div class="header">
+        <button class="primary" (click)="pick()" [disabled]="busy">安装 Skill (.zip)</button>
+        <button (click)="toggleMarket()" [disabled]="busy">
+            {{ showMarket ? '收起市场' : '浏览市场' }}
+        </button>
+        <button (click)="reload()" [disabled]="busy">刷新</button>
+        <input #file type="file" accept=".zip,application/zip" (change)="onFile($event)" hidden>
+    </div>
+
+    <div class="error" *ngIf="error">{{ error }}</div>
+    <div class="info" *ngIf="info">{{ info }}</div>
+
+    <!-- 市场面板 -->
+    <div class="market" *ngIf="showMarket">
+        <div class="search-bar">
+            <input [(ngModel)]="searchQuery" placeholder="搜索 Skill..."
+                   (keyup.enter)="searchMarket()">
+            <button (click)="searchMarket()" [disabled]="marketLoading">搜索</button>
+        </div>
+        <div class="source-tabs">
+            <button [class.active]="marketSource === 'all'" (click)="marketSource='all'; searchMarket()">全部</button>
+            <button [class.active]="marketSource === 'builtin'" (click)="marketSource='builtin'; searchMarket()">内置</button>
+        </div>
+        <div class="market-loading" *ngIf="marketLoading">加载中...</div>
+        <div class="market-list" *ngIf="!marketLoading">
+            <div class="market-item" *ngFor="let item of marketResults">
+                <div class="info-row">
+                    <span class="name">{{ item.name }}</span>
+                    <span class="version" *ngIf="item.version">v{{ item.version }}</span>
+                    <span class="kind">{{ kindLabel(item.kind) }}</span>
+                    <span class="source-tag">{{ item.source === 'builtin' ? '内置' : '远程' }}</span>
+                </div>
+                <div class="desc" *ngIf="item.description">{{ item.description }}</div>
+                <div class="actions">
+                    <button *ngIf="!item.installed" class="primary" (click)="installFromMarket(item)" [disabled]="busy">
+                        安装
+                    </button>
+                    <span *ngIf="item.installed" class="installed-badge">已安装</span>
+                </div>
+            </div>
+            <div class="empty" *ngIf="!marketResults.length">没有找到匹配的 Skill。</div>
+        </div>
+    </div>
+
+    <!-- 已安装列表 -->
+    <div class="section-title" *ngIf="showMarket">已安装的 Skills</div>
+    <div class="empty" *ngIf="!skills.length">尚未安装任何 Skill。</div>
+
+    <div class="skill" *ngFor="let s of skills">
+        <div class="row1">
+            <span class="name">{{ s.name }}</span>
+            <span class="version" *ngIf="s.version">v{{ s.version }}</span>
+            <span class="kind">{{ kindLabel(s.kind) }}</span>
+            <span class="badge" [class.on]="s.enabled" [class.off]="!s.enabled">
+                {{ s.enabled ? '已启用' : '已停用' }}
+            </span>
+        </div>
+        <div class="row2" *ngIf="s.description">{{ s.description }}</div>
+        <div class="row2 err" *ngIf="s.error">加载失败: {{ s.error }}</div>
+        <div class="actions">
+            <button (click)="toggle(s)" [disabled]="busy">
+                {{ s.enabled ? '停用' : '启用' }}
+            </button>
+            <button class="danger" (click)="uninstall(s)" [disabled]="busy">卸载</button>
+        </div>
+    </div>
+</div>
