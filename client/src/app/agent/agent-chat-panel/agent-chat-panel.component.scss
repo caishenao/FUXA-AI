@@ -126,8 +126,14 @@
       }
     }
 
-    &.user { background: #e3f2fd; }
-    &.assistant { background: #f1f8e9; }
+    &.user {
+      background: #e3f2fd;
+      border-left: 3px solid #1565c0;
+    }
+    &.assistant {
+      background: #f1f8e9;
+      border-left: 3px solid #2e7d32;
+    }
     &.thinking {
       background: #f5f5f0;
       border-left: 3px solid #b0bec5;
@@ -135,8 +141,26 @@
       color: #666;
       font-style: italic;
     }
-    &.tool { background: #f5f5f5; font-family: monospace; font-size: 12px; }
-    &.system { background: #fff8e1; font-style: italic; color: #666; text-align: center; font-size: 12px; }
+    &.tool {
+      background: #263238;
+      color: #e0e0e0;
+      border-left: 3px solid #00bcd4;
+      font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
+      font-size: 12px;
+      .role { color: #80cbc4; }
+      .text { color: #b2dfdb; }
+      .copy-btn { color: #80cbc4; background: rgba(255,255,255,0.08); &:hover { background: rgba(255,255,255,0.15); } }
+      .tool-result {
+        margin-top: 6px;
+        padding-top: 6px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        font-size: 11px;
+        color: #90a4ae;
+        max-height: 80px;
+        overflow-y: auto;
+      }
+    }
+    &.system { background: #fff8e1; border-left: 3px solid #f9a825; font-style: italic; color: #666; text-align: center; font-size: 12px; }
   }
 }
 
