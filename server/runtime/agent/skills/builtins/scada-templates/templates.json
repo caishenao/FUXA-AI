@@ -1,0 +1,270 @@
+[
+    {
+        "name": "tank-level",
+        "kind": "gauge",
+        "preview": null,
+        "items": [
+            {
+                "id": "tpl_tank_bg",
+                "type": "svg-ext-rect",
+                "svg": "<g id=\"tpl_tank_bg\" type=\"svg-ext-shapes-rectangle\" fill=\"#1a237e\" stroke=\"#0d47a1\" font-size=\"14\" font-family=\"sans-serif\" text-anchor=\"middle\" transform=\"translate(100,50)\"><rect id=\"tpl_tank_bg\" width=\"80\" height=\"200\" rx=\"4\"/></g>",
+                "x": 100, "y": 50, "width": 80, "height": 200
+            },
+            {
+                "id": "tpl_tank_level",
+                "type": "svg-ext-rect",
+                "svg": "<g id=\"tpl_tank_level\" type=\"svg-ext-shapes-rectangle\" fill=\"#42a5f5\" stroke=\"none\" font-size=\"14\" font-family=\"sans-serif\" text-anchor=\"middle\" transform=\"translate(104,130)\"><rect id=\"tpl_tank_level\" width=\"72\" height=\"116\" rx=\"2\"/></g>",
+                "x": 104, "y": 130, "width": 72, "height": 116
+            },
+            {
+                "id": "tpl_tank_label",
+                "type": "svg-ext-text",
+                "svg": "<text xml:space=\"preserve\" text-anchor=\"middle\" font-family=\"sans-serif\" font-size=\"12\" id=\"tpl_tank_label\" y=\"265\" x=\"140\" stroke-width=\"0\" stroke=\"#ffffff\" fill=\"#ffffff\">液位</text>",
+                "x": 100, "y": 250, "width": 80, "height": 20
+            },
+            {
+                "id": "tpl_tank_value",
+                "type": "value",
+                "svg": "<g id=\"tpl_tank_value\" type=\"svg-ext-value\" fill=\"#ffffff\" stroke=\"#ffffff\" font-size=\"16\" stroke-width=\"0\" font-family=\"sans-serif\" text-anchor=\"middle\" transform=\"translate(100,270)\"><text id=\"tpl_tank_value\" x=\"40\" y=\"0\">0%</text></g>",
+                "x": 100, "y": 270, "width": 80, "height": 24
+            }
+        ]
+    },
+    {
+        "name": "pressure-gauge",
+        "kind": "gauge",
+        "preview": null,
+        "items": [
+            {
+                "id": "tpl_press_bg",
+                "type": "svg-ext-ellipse",
+                "svg": "<g id=\"tpl_press_bg\" type=\"svg-ext-shapes-circle\" fill=\"#263238\" stroke=\"#546e7a\" font-size=\"14\" font-family=\"sans-serif\" text-anchor=\"middle\" transform=\"translate(50,50)\"><ellipse id=\"tpl_press_bg\" cx=\"60\" cy=\"60\" rx=\"60\" ry=\"60\"/></g>",
+                "x": 50, "y": 50, "width": 120, "height": 120
+            },
+            {
+                "id": "tpl_press_needle",
+                "type": "svg-ext-line",
+                "svg": "<line fill=\"none\" stroke=\"#f44336\" x1=\"110\" y1=\"110\" x2=\"110\" y2=\"65\" stroke-width=\"3\" id=\"tpl_press_needle\"/>",
+                "x": 60, "y": 60, "width": 100, "height": 50
+            },
+            {
+                "id": "tpl_press_label",
+                "type": "svg-ext-text",
+                "svg": "<text xml:space=\"preserve\" text-anchor=\"middle\" font-family=\"sans-serif\" font-size=\"11\" id=\"tpl_press_label\" y=\"100\" x=\"110\" stroke-width=\"0\" stroke=\"#90a4ae\" fill=\"#90a4ae\">MPa</text>",
+                "x": 70, "y": 90, "width": 80, "height": 16
+            },
+            {
+                "id": "tpl_press_value",
+                "type": "value",
+                "svg": "<g id=\"tpl_press_value\" type=\"svg-ext-value\" fill=\"#ffffff\" stroke=\"#ffffff\" font-size=\"14\" stroke-width=\"0\" font-family=\"sans-serif\" text-anchor=\"middle\" transform=\"translate(70,110)\"><text id=\"tpl_press_value\" x=\"40\" y=\"0\">0.00</text></g>",
+                "x": 70, "y": 110, "width": 80, "height": 20
+            }
+        ]
+    },
+    {
+        "name": "flow-indicator",
+        "kind": "gauge",
+        "preview": null,
+        "items": [
+            {
+                "id": "tpl_flow_bg",
+                "type": "svg-ext-rect",
+                "svg": "<g id=\"tpl_flow_bg\" type=\"svg-ext-shapes-rectangle\" fill=\"#1b5e20\" stroke=\"#2e7d32\" font-size=\"14\" font-family=\"sans-serif\" text-anchor=\"middle\" transform=\"translate(20,20)\"><rect id=\"tpl_flow_bg\" width=\"160\" height=\"60\" rx=\"6\"/></g>",
+                "x": 20, "y": 20, "width": 160, "height": 60
+            },
+            {
+                "id": "tpl_flow_icon",
+                "type": "svg-ext-text",
+                "svg": "<text xml:space=\"preserve\" text-anchor=\"middle\" font-family=\"sans-serif\" font-size=\"20\" id=\"tpl_flow_icon\" y=\"56\" x=\"50\" stroke-width=\"0\" stroke=\"#a5d6a7\" fill=\"#a5d6a7\">→</text>",
+                "x": 30, "y": 30, "width": 40, "height": 40
+            },
+            {
+                "id": "tpl_flow_value",
+                "type": "value",
+                "svg": "<g id=\"tpl_flow_value\" type=\"svg-ext-value\" fill=\"#ffffff\" stroke=\"#ffffff\" font-size=\"18\" stroke-width=\"0\" font-family=\"sans-serif\" text-anchor=\"middle\" transform=\"translate(70,35)\"><text id=\"tpl_flow_value\" x=\"60\" y=\"10\">0.0 m³/h</text></g>",
+                "x": 70, "y": 35, "width": 100, "height": 30
+            }
+        ]
+    },
+    {
+        "name": "temp-display",
+        "kind": "gauge",
+        "preview": null,
+        "items": [
+            {
+                "id": "tpl_temp_bg",
+                "type": "svg-ext-rect",
+                "svg": "<g id=\"tpl_temp_bg\" type=\"svg-ext-shapes-rectangle\" fill=\"#b71c1c\" stroke=\"#c62828\" font-size=\"14\" font-family=\"sans-serif\" text-anchor=\"middle\" transform=\"translate(20,20)\"><rect id=\"tpl_temp_bg\" width=\"120\" height=\"50\" rx=\"6\"/></g>",
+                "x": 20, "y": 20, "width": 120, "height": 50
+            },
+            {
+                "id": "tpl_temp_label",
+                "type": "svg-ext-text",
+                "svg": "<text xml:space=\"preserve\" text-anchor=\"start\" font-family=\"sans-serif\" font-size=\"11\" id=\"tpl_temp_label\" y=\"38\" x=\"30\" stroke-width=\"0\" stroke=\"#ef9a9a\" fill=\"#ef9a9a\">温度</text>",
+                "x": 30, "y": 25, "width": 40, "height": 16
+            },
+            {
+                "id": "tpl_temp_value",
+                "type": "value",
+                "svg": "<g id=\"tpl_temp_value\" type=\"svg-ext-value\" fill=\"#ffffff\" stroke=\"#ffffff\" font-size=\"22\" stroke-width=\"0\" font-family=\"sans-serif\" text-anchor=\"middle\" transform=\"translate(30,45)\"><text id=\"tpl_temp_value\" x=\"50\" y=\"0\">0.0 °C</text></g>",
+                "x": 30, "y": 45, "width": 100, "height": 26
+            }
+        ]
+    },
+    {
+        "name": "motor-status",
+        "kind": "gauge",
+        "preview": null,
+        "items": [
+            {
+                "id": "tpl_motor_bg",
+                "type": "svg-ext-rect",
+                "svg": "<g id=\"tpl_motor_bg\" type=\"svg-ext-shapes-rectangle\" fill=\"#212121\" stroke=\"#424242\" font-size=\"14\" font-family=\"sans-serif\" text-anchor=\"middle\" transform=\"translate(20,20)\"><rect id=\"tpl_motor_bg\" width=\"100\" height=\"60\" rx=\"6\"/></g>",
+                "x": 20, "y": 20, "width": 100, "height": 60
+            },
+            {
+                "id": "tpl_motor_led",
+                "type": "svg-ext-ellipse",
+                "svg": "<g id=\"tpl_motor_led\" type=\"svg-ext-shapes-circle\" fill=\"#4caf50\" stroke=\"#2e7d32\" font-size=\"14\" font-family=\"sans-serif\" text-anchor=\"middle\" transform=\"translate(30,35)\"><ellipse id=\"tpl_motor_led\" cx=\"10\" cy=\"10\" rx=\"10\" ry=\"10\"/></g>",
+                "x": 30, "y": 35, "width": 20, "height": 20
+            },
+            {
+                "id": "tpl_motor_label",
+                "type": "svg-ext-text",
+                "svg": "<text xml:space=\"preserve\" text-anchor=\"start\" font-family=\"sans-serif\" font-size=\"12\" id=\"tpl_motor_label\" y=\"50\" x=\"56\" stroke-width=\"0\" stroke=\"#ffffff\" fill=\"#ffffff\">运行</text>",
+                "x": 56, "y": 38, "width": 50, "height": 16
+            }
+        ]
+    },
+    {
+        "name": "valve-status",
+        "kind": "gauge",
+        "preview": null,
+        "items": [
+            {
+                "id": "tpl_valve_bg",
+                "type": "svg-ext-rect",
+                "svg": "<g id=\"tpl_valve_bg\" type=\"svg-ext-shapes-rectangle\" fill=\"#1a1a2e\" stroke=\"#303f9f\" font-size=\"14\" font-family=\"sans-serif\" text-anchor=\"middle\" transform=\"translate(20,20)\"><rect id=\"tpl_valve_bg\" width=\"80\" height=\"80\" rx=\"6\"/></g>",
+                "x": 20, "y": 20, "width": 80, "height": 80
+            },
+            {
+                "id": "tpl_valve_icon",
+                "type": "svg-ext-text",
+                "svg": "<text xml:space=\"preserve\" text-anchor=\"middle\" font-family=\"sans-serif\" font-size=\"28\" id=\"tpl_valve_icon\" y=\"65\" x=\"60\" stroke-width=\"0\" stroke=\"#7986cb\" fill=\"#7986cb\">✕</text>",
+                "x": 35, "y": 35, "width": 50, "height": 36
+            },
+            {
+                "id": "tpl_valve_label",
+                "type": "svg-ext-text",
+                "svg": "<text xml:space=\"preserve\" text-anchor=\"middle\" font-family=\"sans-serif\" font-size=\"11\" id=\"tpl_valve_label\" y=\"92\" x=\"60\" stroke-width=\"0\" stroke=\"#9fa8da\" fill=\"#9fa8da\">阀门</text>",
+                "x": 30, "y": 80, "width": 60, "height": 16
+            }
+        ]
+    },
+    {
+        "name": "alarm-banner",
+        "kind": "gauge",
+        "preview": null,
+        "items": [
+            {
+                "id": "tpl_alarm_bg",
+                "type": "svg-ext-rect",
+                "svg": "<g id=\"tpl_alarm_bg\" type=\"svg-ext-shapes-rectangle\" fill=\"#e65100\" stroke=\"#bf360c\" font-size=\"14\" font-family=\"sans-serif\" text-anchor=\"middle\" transform=\"translate(0,0)\"><rect id=\"tpl_alarm_bg\" width=\"400\" height=\"40\" rx=\"0\"/></g>",
+                "x": 0, "y": 0, "width": 400, "height": 40
+            },
+            {
+                "id": "tpl_alarm_text",
+                "type": "svg-ext-text",
+                "svg": "<text xml:space=\"preserve\" text-anchor=\"start\" font-family=\"sans-serif\" font-size=\"14\" id=\"tpl_alarm_text\" y=\"26\" x=\"12\" stroke-width=\"0\" stroke=\"#ffffff\" fill=\"#ffffff\">报警信息</text>",
+                "x": 12, "y": 8, "width": 376, "height": 24
+            }
+        ]
+    },
+    {
+        "name": "trend-mini",
+        "kind": "gauge",
+        "preview": null,
+        "items": [
+            {
+                "id": "tpl_trend_bg",
+                "type": "svg-ext-rect",
+                "svg": "<g id=\"tpl_trend_bg\" type=\"svg-ext-shapes-rectangle\" fill=\"#0d1b2a\" stroke=\"#1b2838\" font-size=\"14\" font-family=\"sans-serif\" text-anchor=\"middle\" transform=\"translate(10,10)\"><rect id=\"tpl_trend_bg\" width=\"200\" height=\"100\" rx=\"4\"/></g>",
+                "x": 10, "y": 10, "width": 200, "height": 100
+            },
+            {
+                "id": "tpl_trend_line",
+                "type": "svg-ext-line",
+                "svg": "<polyline fill=\"none\" stroke=\"#42a5f5\" points=\"15,95 45,80 75,60 105,70 135,40 165,50 195,30\" stroke-width=\"2\" id=\"tpl_trend_line\"/>",
+                "x": 15, "y": 30, "width": 180, "height": 65
+            },
+            {
+                "id": "tpl_trend_label",
+                "type": "svg-ext-text",
+                "svg": "<text xml:space=\"preserve\" text-anchor=\"start\" font-family=\"sans-serif\" font-size=\"10\" id=\"tpl_trend_label\" y=\"24\" x=\"15\" stroke-width=\"0\" stroke=\"#546e7a\" fill=\"#546e7a\">趋势</text>",
+                "x": 15, "y": 14, "width": 40, "height": 14
+            }
+        ]
+    },
+    {
+        "name": "kpi-card",
+        "kind": "gauge",
+        "preview": null,
+        "items": [
+            {
+                "id": "tpl_kpi_bg",
+                "type": "svg-ext-rect",
+                "svg": "<g id=\"tpl_kpi_bg\" type=\"svg-ext-shapes-rectangle\" fill=\"#16213e\" stroke=\"#1a1a2e\" font-size=\"14\" font-family=\"sans-serif\" text-anchor=\"middle\" transform=\"translate(10,10)\"><rect id=\"tpl_kpi_bg\" width=\"140\" height=\"80\" rx=\"8\"/></g>",
+                "x": 10, "y": 10, "width": 140, "height": 80
+            },
+            {
+                "id": "tpl_kpi_label",
+                "type": "svg-ext-text",
+                "svg": "<text xml:space=\"preserve\" text-anchor=\"start\" font-family=\"sans-serif\" font-size=\"11\" id=\"tpl_kpi_label\" y=\"32\" x=\"20\" stroke-width=\"0\" stroke=\"#78909c\" fill=\"#78909c\">产量</text>",
+                "x": 20, "y": 20, "width": 100, "height": 16
+            },
+            {
+                "id": "tpl_kpi_value",
+                "type": "value",
+                "svg": "<g id=\"tpl_kpi_value\" type=\"svg-ext-value\" fill=\"#ffffff\" stroke=\"#ffffff\" font-size=\"26\" stroke-width=\"0\" font-family=\"sans-serif\" text-anchor=\"start\" transform=\"translate(20,42)\"><text id=\"tpl_kpi_value\" x=\"0\" y=\"0\">1,234</text></g>",
+                "x": 20, "y": 42, "width": 100, "height": 30
+            },
+            {
+                "id": "tpl_kpi_unit",
+                "type": "svg-ext-text",
+                "svg": "<text xml:space=\"preserve\" text-anchor=\"start\" font-family=\"sans-serif\" font-size=\"10\" id=\"tpl_kpi_unit\" y=\"80\" x=\"20\" stroke-width=\"0\" stroke=\"#546e7a\" fill=\"#546e7a\">件/小时</text>",
+                "x": 20, "y": 72, "width": 60, "height": 14
+            }
+        ]
+    },
+    {
+        "name": "pump-status",
+        "kind": "gauge",
+        "preview": null,
+        "items": [
+            {
+                "id": "tpl_pump_bg",
+                "type": "svg-ext-rect",
+                "svg": "<g id=\"tpl_pump_bg\" type=\"svg-ext-shapes-rectangle\" fill=\"#004d40\" stroke=\"#00695c\" font-size=\"14\" font-family=\"sans-serif\" text-anchor=\"middle\" transform=\"translate(20,20)\"><rect id=\"tpl_pump_bg\" width=\"100\" height=\"70\" rx=\"6\"/></g>",
+                "x": 20, "y": 20, "width": 100, "height": 70
+            },
+            {
+                "id": "tpl_pump_icon",
+                "type": "svg-ext-ellipse",
+                "svg": "<g id=\"tpl_pump_icon\" type=\"svg-ext-shapes-circle\" fill=\"#00897b\" stroke=\"#004d40\" font-size=\"14\" font-family=\"sans-serif\" text-anchor=\"middle\" transform=\"translate(45,30)\"><ellipse id=\"tpl_pump_icon\" cx=\"25\" cy=\"25\" rx=\"20\" ry=\"20\"/></g>",
+                "x": 45, "y": 30, "width": 50, "height": 50
+            },
+            {
+                "id": "tpl_pump_label",
+                "type": "svg-ext-text",
+                "svg": "<text xml:space=\"preserve\" text-anchor=\"middle\" font-family=\"sans-serif\" font-size=\"12\" id=\"tpl_pump_label\" y=\"55\" x=\"70\" stroke-width=\"0\" stroke=\"#ffffff\" fill=\"#ffffff\">泵</text>",
+                "x": 50, "y": 42, "width": 40, "height": 16
+            },
+            {
+                "id": "tpl_pump_status",
+                "type": "value",
+                "svg": "<g id=\"tpl_pump_status\" type=\"svg-ext-value\" fill=\"#a5d6a7\" stroke=\"#a5d6a7\" font-size=\"11\" stroke-width=\"0\" font-family=\"sans-serif\" text-anchor=\"middle\" transform=\"translate(30,80)\"><text id=\"tpl_pump_status\" x=\"40\" y=\"0\">运行中</text></g>",
+                "x": 30, "y": 80, "width": 80, "height": 16
+            }
+        ]
+    }
+]

@@ -1,0 +1,9 @@
+{
+    "name": "SCADA 仪表盘模板",
+    "slug": "scada-templates",
+    "version": "1.0.0",
+    "kind": "asset-pack",
+    "templates": "templates.json",
+    "description": "工业 SCADA 常用仪表盘模板集合：压力表、流量计、温度计、趋势图、报警面板等",
+    "author": "frangoteam"
+}
