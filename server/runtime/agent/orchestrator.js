@@ -274,12 +274,15 @@ class Orchestrator {
     }
 
     async _runOne(call, tools, exec) {
-        const desc = tools.find(t => t.name === call.name);
-        if (!desc) return { error: 'unknown_tool', tool: call.name };
-        const errs = toolRouter.validate(desc.input_schema, call.args || {});
+        const name = call.name || call.function?.name;
+        let args = call.args ?? call.function?.arguments ?? {};
+        if (typeof args === 'string') { try { args = JSON.parse(args); } catch { args = {}; } }
+        const desc = tools.find(t => t.name === name);
+        if (!desc) return { error: 'unknown_tool', tool: name };
+        const errs = toolRouter.validate(desc.input_schema, args);
         if (errs.length) return { error: 'invalid_args', details: errs };
         try {
-            return await exec[call.name](call.args || {});
+            return await exec[name](args);
         } catch (err) {
             return { error: 'tool_failed', message: String(err?.message || err) };
         }
@@ -384,7 +387,7 @@ class Orchestrator {
     }
 
     _initialMessages({ cfg, view, selection, userText, attachments }) {
-        const sys = [
+        const parts = [
             'You are FUXA Agent, an assistant embedded in a web SCADA/HMI editor.',
             'You can modify the active View, manage devices/tags, run scripts, and query project data.',
             'Do NOT emit raw SVG or code blocks in chat. Always use structured tools.',
@@ -393,7 +396,16 @@ class Orchestrator {
             `Current view: id=${view.id} name=${view.name || ''} profile=${JSON.stringify(view.profile || {})}.`,
             `Items count: ${Object.keys(view.items || {}).length}.`,
             cfg.language ? `Reply in ${cfg.language}.` : ''
-        ].filter(Boolean).join('\n');
+        ];
+
+        // Inject instruction-pack instructions into system prompt.
+        const skillMgr = this.runtime?.agentMgr?.getSkillManager?.();
+        if (skillMgr) {
+            const instr = skillMgr.getInstructions();
+            if (instr) parts.push('\n--- SKILL INSTRUCTIONS ---\n' + instr);
+        }
+
+        const sys = parts.filter(Boolean).join('\n');
 
         const userParts = [];
         if (selection && selection.ids && selection.ids.length) {
