@@ -249,13 +249,76 @@ function descriptors() {
                                 actoptions: { type: 'object' }
                             }
                         }
+                    },
+                    ranges: {
+                        type: 'array',
+                        description: 'Conditional coloring ranges based on tag value. Each: {min, max, color, stroke?, text?}.',
+                        items: {
+                            type: 'object',
+                            required: ['min', 'max', 'color'],
+                            properties: {
+                                min: { type: 'number' },
+                                max: { type: 'number' },
+                                color: { type: 'string' },
+                                stroke: { type: 'string' },
+                                text: { type: 'string' }
+                            }
+                        }
+                    },
+                    actions: {
+                        type: 'array',
+                        description: 'Tag-triggered animations: {variableId, type, range?, options?}. blink: toggles fill/stroke colors. rotate: spins element. move: repositions. color: changes fill/stroke.',
+                        items: {
+                            type: 'object',
+                            required: ['variableId', 'type'],
+                            properties: {
+                                variableId: { type: 'string' },
+                                bitmask: { type: 'number' },
+                                type: { type: 'string', enum: [
+                                    'shapes.action-hide', 'shapes.action-show',
+                                    'shapes.action-blink', 'shapes.action-color',
+                                    'shapes.action-stop', 'shapes.action-clockwise',
+                                    'shapes.action-anticlockwise', 'shapes.action-downup',
+                                    'shapes.action-rotate', 'shapes.action-move',
+                                    'shapes.action-monitor', 'shapes.action-refreshImage',
+                                    'shapes.action-start', 'shapes.action-pause',
+                                    'shapes.action-reset'
+                                ]},
+                                range: {
+                                    type: 'object',
+                                    properties: {
+                                        min: { type: 'number' },
+                                        max: { type: 'number' },
+                                        color: { type: 'string' },
+                                        stroke: { type: 'string' },
+                                        text: { type: 'string' }
+                                    }
+                                },
+                                options: {
+                                    type: 'object',
+                                    properties: {
+                                        fillA: { type: 'string' }, fillB: { type: 'string' },
+                                        strokeA: { type: 'string' }, strokeB: { type: 'string' },
+                                        interval: { type: 'number' },
+                                        minAngle: { type: 'number' }, maxAngle: { type: 'number' },
+                                        delay: { type: 'number' },
+                                        toX: { type: 'number' }, toY: { type: 'number' },
+                                        duration: { type: 'number' }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    options: {
+                        type: 'object',
+                        description: 'Gauge-specific display options.'
                     }
                 }
             }
         },
         {
             name: 'view_update_gauge',
-            description: 'Patch one or more existing gauges. If `ids` is omitted and the user has a selection, the update applies to the selection.',
+            description: 'Patch one or more existing gauges. If `ids` is omitted and the user has a selection, the update applies to the selection. Supports ranges (conditional coloring), actions (blink/rotate/move/color animations), and options.',
             input_schema: {
                 type: 'object',
                 properties: {
@@ -297,6 +360,75 @@ function descriptors() {
                                 actoptions: { type: 'object' }
                             }
                         }
+                    },
+                    ranges: {
+                        type: 'array',
+                        description: 'Conditional coloring ranges based on tag value. Each: {min, max, color, stroke?, text?}. When tag value falls in [min,max), gauge changes to that color.',
+                        items: {
+                            type: 'object',
+                            required: ['min', 'max', 'color'],
+                            properties: {
+                                min: { type: 'number' },
+                                max: { type: 'number' },
+                                color: { type: 'string', pattern: '^#[0-9A-Fa-f]{6,8}$', description: 'Fill color when value is in range.' },
+                                stroke: { type: 'string', pattern: '^#[0-9A-Fa-f]{6,8}$', description: 'Stroke color when value is in range.' },
+                                text: { type: 'string', description: 'Label for this range (e.g. "Low", "Normal", "High").' }
+                            }
+                        }
+                    },
+                    actions: {
+                        type: 'array',
+                        description: 'Tag-triggered animations. Each: {variableId, type, range?, options?}. type=blink toggles colors, type=rotate spins element, type=move repositions, type=color changes fill/stroke.',
+                        items: {
+                            type: 'object',
+                            required: ['variableId', 'type'],
+                            properties: {
+                                variableId: { type: 'string', description: 'Tag id whose value triggers this action.' },
+                                bitmask: { type: 'number', description: 'Bitmask for boolean/bit-level triggers.' },
+                                type: { type: 'string', enum: [
+                                    'shapes.action-hide', 'shapes.action-show',
+                                    'shapes.action-blink', 'shapes.action-color',
+                                    'shapes.action-stop', 'shapes.action-clockwise',
+                                    'shapes.action-anticlockwise', 'shapes.action-downup',
+                                    'shapes.action-rotate', 'shapes.action-move',
+                                    'shapes.action-monitor', 'shapes.action-refreshImage',
+                                    'shapes.action-start', 'shapes.action-pause',
+                                    'shapes.action-reset'
+                                ]},
+                                range: {
+                                    type: 'object',
+                                    description: 'Condition: action fires when tag value is in [min,max].',
+                                    properties: {
+                                        min: { type: 'number' },
+                                        max: { type: 'number' },
+                                        color: { type: 'string' },
+                                        stroke: { type: 'string' },
+                                        text: { type: 'string' }
+                                    }
+                                },
+                                options: {
+                                    type: 'object',
+                                    description: 'Action-specific options. blink: {fillA, fillB, strokeA, strokeB, interval}. rotate: {minAngle, maxAngle, delay}. move: {toX, toY, duration}.',
+                                    properties: {
+                                        fillA: { type: 'string' },
+                                        fillB: { type: 'string' },
+                                        strokeA: { type: 'string' },
+                                        strokeB: { type: 'string' },
+                                        interval: { type: 'number' },
+                                        minAngle: { type: 'number' },
+                                        maxAngle: { type: 'number' },
+                                        delay: { type: 'number' },
+                                        toX: { type: 'number' },
+                                        toY: { type: 'number' },
+                                        duration: { type: 'number' }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    options: {
+                        type: 'object',
+                        description: 'Gauge-specific display options (pipe config, progress bar settings, etc.).'
                     }
                 }
             }
@@ -470,7 +602,10 @@ function executors(ctx) {
                     fontSize: args.fontSize,
                     variableId: args.tagId || null,
                     bbox: { x: args.x, y: args.y, w: args.w, h: args.h },
-                    events: args.events || []
+                    events: args.events || [],
+                    ranges: args.ranges || undefined,
+                    actions: args.actions || undefined,
+                    options: args.options || undefined
                 }
             };
             buffer.view.items = buffer.view.items || {};
@@ -508,6 +643,9 @@ function executors(ctx) {
                 if (args.fontSize !== undefined) it.property.fontSize = args.fontSize;
                 if (args.tagId !== undefined) it.property.variableId = args.tagId;
                 if (args.events !== undefined) it.property.events = args.events;
+                if (args.ranges !== undefined) it.property.ranges = args.ranges;
+                if (args.actions !== undefined) it.property.actions = args.actions;
+                if (args.options !== undefined) it.property.options = args.options;
                 // Sync SVG attributes.
                 if (buffer.view.svgcontent && Object.keys(svgAttrs).length) {
                     buffer.view.svgcontent = updateSvgAttributes(buffer.view.svgcontent, tid, svgAttrs);
