@@ -181,6 +181,17 @@ function descriptors() {
                     type: { type: 'string', enum: ['svg', 'cards', 'maps'] }
                 }
             }
+        },
+        {
+            name: 'view_switch',
+            description: 'Switch the active view. Commits any pending changes to the current view, then loads the target view as the new active view. After switching, all subsequent view_read, view_add_gauge, view_update_gauge, etc. operate on the new view.',
+            input_schema: {
+                type: 'object',
+                required: ['view'],
+                properties: {
+                    view: { type: 'string', description: 'Target view id or name to switch to.' }
+                }
+            }
         }
     ];
 }
@@ -426,6 +437,20 @@ function executors(ctx) {
                 }
             }
             return { ok: true, view: view.name || view.id, profile: view.profile };
+        },
+        'view_switch': async (args) => {
+            const project = runtime?.project;
+            if (!project) return { error: 'no_project' };
+            let target;
+            try {
+                const data = await project.getProject();
+                const views = data?.hmi?.views || [];
+                target = views.find(v => v.id === args.view || v.name === args.view);
+            } catch (_) { /* defensive */ }
+            if (!target) return { error: 'view_not_found', view: args.view };
+            // Signal the orchestrator to switch after this tool call returns.
+            buffer.switchTo = target.id;
+            return { ok: true, switchedTo: target.id, name: target.name, itemsCount: Object.keys(target.items || {}).length };
         }
     };
 }

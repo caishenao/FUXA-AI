@@ -157,6 +157,7 @@ class Orchestrator {
         let lastText = '';
         let usageTotal = { input: 0, output: 0 };
         let anyCommitted = false;
+        let activeViewId = viewId;
 
         // Persist user message.
         if (this.storage) {
@@ -222,19 +223,35 @@ class Orchestrator {
                 // Real-time commit: after each tool that modifies the view,
                 // persist and push the updated view so the canvas refreshes immediately.
                 if (buffer.dirty) {
-                    const commitResult = await this._commit(viewId, buffer);
+                    const commitResult = await this._commit(activeViewId, buffer);
                     if (commitResult.ok) {
                         buffer.dirty = false;
                         anyCommitted = true;
                         this._emit('agent:view-updated', {
-                            sessionId, viewId,
+                            sessionId, viewId: activeViewId,
                             itemsCount: commitResult.itemsCount
                         });
                         // Reload buffer from persisted data so subsequent tool calls
                         // see the latest committed state.
-                        const freshView = this._loadView(viewId);
+                        const freshView = this._loadView(activeViewId);
                         if (freshView) buffer.view = deepClone(freshView);
                     }
+                }
+
+                // View switch: commit current view if dirty, then load target view.
+                if (buffer.switchTo) {
+                    if (buffer.dirty) {
+                        const sw = await this._commit(activeViewId, buffer);
+                        if (sw && sw.ok) anyCommitted = true;
+                        buffer.dirty = false;
+                    }
+                    const newView = this._loadView(buffer.switchTo);
+                    if (newView) {
+                        activeViewId = buffer.switchTo;
+                        buffer.view = deepClone(newView);
+                        this.logger?.info?.(`agent: switched to view ${activeViewId} (${newView.name || ''})`);
+                    }
+                    buffer.switchTo = null;
                 }
 
                 if (buffer.commitRequested) break;
@@ -246,7 +263,7 @@ class Orchestrator {
         if (buffer.dirty) {
             // Catch-all: commit any remaining dirty changes that weren't
             // committed during the loop (e.g. device/layout patches).
-            committed = await this._commit(viewId, buffer);
+            committed = await this._commit(activeViewId, buffer);
             if (committed && committed.ok) anyCommitted = true;
         }
         // If changes were committed during the loop but nothing new at the end,
@@ -254,7 +271,7 @@ class Orchestrator {
         if (!committed && anyCommitted) {
             committed = {
                 ok: true,
-                viewId,
+                viewId: activeViewId,
                 itemsCount: Object.keys(buffer.view?.items || {}).length
             };
         }
@@ -404,7 +421,7 @@ class Orchestrator {
             '',
             '=== TOOL GROUPS ===',
             'view_*: view_read, view_add_gauge, view_update_gauge, view_delete_gauge, view_bind_tag, view_set_profile, view_set_layout, view_save, view_set_event, view_update_property',
-            'view project: view_list, view_create, view_delete',
+            'view project: view_list, view_create, view_delete, view_switch',
             'device_*: device_list, device_read, device_add, device_update, device_delete, device_enable, device_update_property',
             'tag_*: tag_list, tag_read_value, tag_set_value, tag_history, tag_add',
             'script_*: script_list, script_run, script_create, script_update, script_delete',
@@ -440,6 +457,7 @@ class Orchestrator {
             '=== VIEW MANAGEMENT ===',
             'view_create: create new view with name, width, height, bkcolor',
             'view_delete: delete view by id/name (confirmDelete:true)',
+            'view_switch: switch active view by id/name. Commits pending changes, then loads the target view. After switching, view_read/view_add_gauge etc. operate on the new view.',
             'view_update_property: set name, width, height, bkcolor, type (svg/cards/maps) on a view',
             'view_set_event: set onopen/onclose events, e.g. events:[{type:"shapes.event-onopen",action:"shapes.event-onrunscript",actparam:"MyScript"}]',
             '',
