@@ -1,0 +1,227 @@
+:host {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1200;
+  font-family: inherit;
+}
+
+.agent-fab {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #2962ff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+
+  &:hover { background: #1a4ed8; }
+}
+
+.agent-panel {
+  width: 400px;
+  height: 600px;
+  background: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #2962ff;
+  color: #fff;
+
+  .title { font-weight: 600; }
+  .selection {
+    background: rgba(255,255,255,0.2);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+  .spacer { flex: 1; }
+  .hbtn {
+    background: transparent;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 2px 6px;
+
+    &:hover:not(:disabled) { background: rgba(255,255,255,0.15); border-radius: 4px; }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+  }
+}
+
+.panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  background: #fafbfc;
+
+  .hint {
+    color: #888;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .msg {
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    position: relative;
+
+    .copy-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: rgba(0,0,0,0.08);
+      border: none;
+      border-radius: 4px;
+      padding: 2px 6px;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      opacity: 0;
+      transition: opacity 0.15s;
+      color: #555;
+
+      &:hover { background: rgba(0,0,0,0.15); }
+    }
+    &:hover .copy-btn { opacity: 1; }
+
+    .role { font-size: 11px; opacity: 0.6; margin-bottom: 2px; text-transform: uppercase; }
+    .text { color: #1a1a1a; }
+    .pending { font-style: italic; color: #666; }
+    .error { color: #d32f2f; }
+
+    .attachments {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 4px 0;
+
+      img {
+        width: 64px;
+        height: 64px;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+      }
+    }
+
+    &.user { background: #e3f2fd; }
+    &.assistant { background: #f1f8e9; }
+    &.tool { background: #f5f5f5; font-family: monospace; font-size: 12px; }
+    &.system { background: #fff8e1; font-style: italic; color: #666; text-align: center; font-size: 12px; }
+  }
+}
+
+.attach-bar {
+  display: flex;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #fff;
+  border-top: 1px solid #eee;
+
+  .thumb {
+    position: relative;
+    width: 48px;
+    height: 48px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: #d32f2f;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      line-height: 1;
+    }
+  }
+}
+
+.panel-input {
+  border-top: 1px solid #e0e0e0;
+  padding: 8px 12px;
+  background: #fff;
+
+  textarea {
+    width: 100%;
+    border: 1px solid #d0d7de;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-family: inherit;
+    font-size: 13px;
+    resize: vertical;
+    box-sizing: border-box;
+
+    &:focus { outline: 2px solid #2962ff33; border-color: #2962ff; }
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    margin-top: 6px;
+
+    .spacer { flex: 1; }
+
+    .upload {
+      cursor: pointer;
+      padding: 4px 8px;
+      border: 1px solid #d0d7de;
+      border-radius: 4px;
+
+      input { display: none; }
+
+      &.disabled { opacity: 0.5; pointer-events: none; }
+    }
+
+    .send {
+      background: #2962ff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 16px;
+      cursor: pointer;
+      font-weight: 600;
+
+      &:hover:not(:disabled) { background: #1a4ed8; }
+      &:disabled { opacity: 0.5; cursor: not-allowed; }
+    }
+  }
+
+  .error-line {
+    color: #d32f2f;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+}

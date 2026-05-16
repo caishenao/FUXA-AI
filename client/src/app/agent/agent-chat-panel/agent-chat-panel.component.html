@@ -1,0 +1,60 @@
+<div class="agent-fab" *ngIf="collapsed" (click)="toggle()" title="FUXA Agent">
+    <span class="fab-icon">AI</span>
+</div>
+
+<div class="agent-panel" *ngIf="!collapsed">
+    <div class="panel-header">
+        <span class="title">FUXA Agent</span>
+        <span class="selection" *ngIf="selectionLabel()">{{ selectionLabel() }}</span>
+        <span class="spacer"></span>
+        <button class="hbtn" *ngIf="undoAvailable" (click)="undo()" [disabled]="busy" title="撤销上次修改">↩</button>
+        <button class="hbtn" (click)="clear()" title="清空会话">⟲</button>
+        <button class="hbtn" (click)="toggle()" title="收起">×</button>
+    </div>
+
+    <div class="panel-body" #scrollContainer>
+        <div *ngIf="!messages.length" class="hint">
+            描述你想要的组态界面，例如：<br>
+            「做一个污水处理厂总览，左上角液位，右侧 4 台水泵状态」
+        </div>
+        <div *ngFor="let m of messages" class="msg" [class.user]="m.role==='user'"
+             [class.assistant]="m.role==='assistant'" [class.tool]="m.role==='tool'"
+             [class.system]="m.role==='system'">
+            <button class="copy-btn" (click)="copyMessage(m)" [title]="copiedId===m.id ? '已复制' : '复制'">
+                {{ copiedId===m.id ? '✓' : '⧉' }}
+            </button>
+            <div class="role">{{ m.role }}</div>
+            <div *ngIf="m.attachments?.length" class="attachments">
+                <img *ngFor="let a of m.attachments" [src]="a.dataUrl" [alt]="a.name">
+            </div>
+            <div *ngIf="m.pending" class="pending">… 思考中</div>
+            <div class="text" *ngIf="m.text">{{ m.text }}</div>
+            <div class="error" *ngIf="m.error">{{ m.error }}</div>
+        </div>
+    </div>
+
+    <div class="attach-bar" *ngIf="attachments.length">
+        <div class="thumb" *ngFor="let a of attachments; let i = index">
+            <img [src]="a.dataUrl" [alt]="a.name">
+            <button (click)="removeAttachment(i)">×</button>
+        </div>
+    </div>
+
+    <div class="panel-input">
+        <textarea #input rows="2"
+                  placeholder="Ctrl+Enter 发送 · 拖入或粘贴图片"
+                  [disabled]="busy"
+                  (keydown)="onKey($event)"></textarea>
+        <div class="row">
+            <label class="upload" [class.disabled]="busy || attachments.length>=4">
+                <input type="file" accept="image/*" multiple (change)="onFileSelected($event)">
+                📎
+            </label>
+            <span class="spacer"></span>
+            <button class="send" (click)="send(input.value)" [disabled]="busy">
+                {{ busy ? '...' : '发送' }}
+            </button>
+        </div>
+        <div class="error-line" *ngIf="error">{{ error }}</div>
+    </div>
+</div>

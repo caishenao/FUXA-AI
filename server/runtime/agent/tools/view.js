@@ -47,7 +47,7 @@ function _esc(s) {
  * Build an SVG fragment for a newly added gauge.
  * Returns { id, svg } where id is the SVG element id and svg is the markup string.
  */
-function buildSvg(type, x, y, w, h, fill, stroke, fontSize, text) {
+function buildSvg(type, x, y, w, h, fill, stroke, fontSize, text, options) {
     const f = fill || '#1565c0';
     const s = stroke || '#0D47A1';
     const fs = fontSize || 14;
@@ -110,8 +110,62 @@ function buildSvg(type, x, y, w, h, fill, stroke, fontSize, text) {
                 `<ellipse id="${id}" cx="${x + w / 2}" cy="${y + h / 2}" rx="${w / 2}" ry="${h / 2}"/>` +
                 `</g>` };
         }
-        default:
+        case 'pipe': {
+            const pipeW = (options && options.pipeWidth) || 10;
+            const contentW = (options && options.contentWidth) || Math.max(2, pipeW - 4);
+            const border = (options && options.border) || f;
+            const content = (options && options.content) || s;
+            const aId = 'A-' + id, bId = 'B-' + id, cId = 'C-' + id;
+            return { id, svg:
+                `<g type="svg-ext-pipe" id="${id}" fill="${f}" stroke="${s}" font-size="${fs}" font-family="sans-serif" stroke-width="1" transform="translate(${x},${y})" xml:space="preserve">` +
+                `<rect fill="${border}" height="${pipeW}" width="${w}" y="${(h - pipeW) / 2}" x="0" id="${aId}"/>` +
+                `<rect fill="${content}" height="${contentW}" width="${w}" y="${(h - contentW) / 2}" x="0" id="${bId}"/>` +
+                `<rect fill="none" height="${pipeW}" width="${w}" y="${(h - pipeW) / 2}" x="0" stroke="${border}" id="${cId}"/>` +
+                `</g>` };
+        }
+        default: {
+            // ForeignObject-based controls: html-input, html-select, html-image,
+            // pipe, html-slider, html-switch, html-chart, html-bag,
+            // html-graph-bar, html-graph-pie, own_ctrl-table, own_ctrl-iframe,
+            // own_ctrl-panel, own_ctrl-video, own_ctrl-scheduler
+            const typeAttr = TYPE_ATTR_MAP[type];
+            if (typeAttr) {
+                const bgId = 'svg_' + Math.random().toString(36).slice(2, 10);
+                const foId = 'H-' + id;
+                return { id, svg:
+                    `<g type="${typeAttr}" id="${id}" fill="rgba(0,0,0,0)" stroke="rgba(0,0,0,0)" font-size="${fs}" font-family="sans-serif" transform="translate(${x},${y})" xml:space="preserve" style="pointer-events:none">` +
+                    `<rect stroke-width="0" fill="rgba(0,0,0,0)" height="${h}" width="${w}" y="0" x="0" id="${bgId}"/>` +
+                    `<foreignObject id="${foId}" width="${w}" height="${h}" y="0" x="0">` +
+                    `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${w}px;height:${h}px;"></div>` +
+                    `</foreignObject>` +
+                    `</g>` };
+            }
+            // Shape library types: svg-ext-shapes, svg-ext-proceng, svg-ext-ape
+            if (type === 'svg-ext-shapes') {
+                const shapeName = (options && options.shapeName) || 'rectangle';
+                const shapeType = SHAPES_MAP[shapeName] || 'svg-ext-shapes-rectangle';
+                return { id, svg:
+                    `<g id="${id}" type="${shapeType}" fill="${f}" stroke="${s}" font-size="${fs}" font-family="sans-serif" text-anchor="middle" transform="translate(${x},${y})">` +
+                    `<rect id="${id}" width="${w}" height="${h}"/>` +
+                    `</g>` };
+            }
+            if (type === 'svg-ext-proceng') {
+                const shapeName = (options && options.shapeName) || 'centrifugal';
+                const shapeType = PROCENG_MAP[shapeName] || 'svg-ext-proceng-centrifugal';
+                return { id, svg:
+                    `<g id="${id}" type="${shapeType}" fill="${f}" stroke="${s}" font-size="${fs}" font-family="sans-serif" stroke-width="1" transform="translate(${x},${y})" xml:space="preserve">` +
+                    `<rect id="${id}" width="${w}" height="${h}" fill="none" stroke="${s}" stroke-width="1"/>` +
+                    `</g>` };
+            }
+            if (type === 'svg-ext-ape') {
+                const shapeName = (options && options.shapeName) || 'eli';
+                return { id, svg:
+                    `<g id="${id}" type="svg-ext-ape-${shapeName}" fill="${f}" stroke="${s}" font-size="${fs}" font-family="sans-serif" stroke-width="1" transform="translate(${x},${y})" xml:space="preserve">` +
+                    `<rect id="${id}" width="${w}" height="${h}" fill="none"/>` +
+                    `</g>` };
+            }
             return { id, svg: '' };
+        }
     }
 }
 
@@ -173,10 +227,79 @@ function updateSvgAttributes(svgcontent, elementId, attrs) {
 }
 
 const GAUGE_TYPES = [
+    // Controls
     'html-button', 'html-input', 'html-select', 'html-image',
     'value', 'gauge-progress', 'gauge-semaphore',
-    'svg-ext-rect', 'svg-ext-ellipse', 'svg-ext-text', 'svg-ext-line'
+    'pipe', 'html-slider', 'html-switch',
+    'html-chart', 'html-bag', 'html-graph-bar', 'html-graph-pie',
+    'own_ctrl-table', 'own_ctrl-iframe', 'own_ctrl-panel',
+    'own_ctrl-video', 'own_ctrl-scheduler',
+    // General shapes (SVG drawing)
+    'svg-ext-rect', 'svg-ext-ellipse', 'svg-ext-text', 'svg-ext-line',
+    // Shape library
+    'svg-ext-shapes', 'svg-ext-proceng', 'svg-ext-ape'
 ];
+
+// Map agent type -> SVG type attribute used by the frontend
+const TYPE_ATTR_MAP = {
+    'html-button': 'svg-ext-html_button',
+    'html-input': 'svg-ext-html_input',
+    'html-select': 'svg-ext-html_select',
+    'html-image': 'svg-ext-own_ctrl-image',
+    'value': 'svg-ext-value',
+    'gauge-progress': 'svg-ext-gauge_progress',
+    'gauge-semaphore': 'svg-ext-gauge_semaphore',
+    'pipe': 'svg-ext-pipe',
+    'html-slider': 'svg-ext-html_slider',
+    'html-switch': 'svg-ext-html_switch',
+    'html-chart': 'svg-ext-html_chart',
+    'html-bag': 'svg-ext-html_bag',
+    'html-graph-bar': 'svg-ext-html_graph',
+    'html-graph-pie': 'svg-ext-html_graph',
+    'own_ctrl-table': 'svg-ext-own_ctrl-table',
+    'own_ctrl-iframe': 'svg-ext-own_ctrl-iframe',
+    'own_ctrl-panel': 'svg-ext-own_ctrl-panel',
+    'own_ctrl-video': 'svg-ext-own_ctrl-video',
+    'own_ctrl-scheduler': 'svg-ext-own_ctrl-scheduler',
+    'svg-ext-shapes': 'svg-ext-shapes',
+    'svg-ext-proceng': 'svg-ext-proceng',
+    'svg-ext-ape': 'svg-ext-ape'
+};
+
+// Shape subtypes: agent shapeName -> SVG type attribute suffix
+const SHAPES_MAP = {
+    rectangle: 'svg-ext-shapes-rectangle', rect: 'svg-ext-shapes-rectangle',
+    circle: 'svg-ext-shapes-circle', ellipse: 'svg-ext-shapes-circle',
+    diamond: 'svg-ext-shapes-diamond', triangle: 'svg-ext-shapes-triangle',
+    halfcircle: 'svg-ext-shapes-halfcircle', pentagon: 'svg-ext-shapes-pentagon',
+    octagon: 'svg-ext-shapes-octagon', star4: 'svg-ext-shapes-star4',
+    arrow: 'svg-ext-shapes-arrow', doublearrow: 'svg-ext-shapes-doublearrow',
+    cloud: 'svg-ext-shapes-cloud', cylinder: 'svg-ext-shapes-cylinder',
+    heart: 'svg-ext-shapes-heart', cross: 'svg-ext-shapes-cross',
+    drop: 'svg-ext-shapes-drop', cone: 'svg-ext-shapes-cone',
+    tape: 'svg-ext-shapes-tape', docu: 'svg-ext-shapes-docu',
+    display: 'svg-ext-shapes-display', ticket: 'svg-ext-shapes-ticket',
+    nosymbol: 'svg-ext-shapes-nosymbol', corner: 'svg-ext-shapes-corner',
+    tee: 'svg-ext-shapes-tee', switch: 'svg-ext-shapes-switch',
+    parallelogram: 'svg-ext-shapes-parallelogram', offpage: 'svg-ext-shapes-offpage'
+};
+
+// Proc eng subtypes
+const PROCENG_MAP = {
+    centrifugal: 'svg-ext-proceng-centrifugal', motor: 'svg-ext-proceng-motor',
+    valveax: 'svg-ext-proceng-valveax', valvebx: 'svg-ext-proceng-valvebx',
+    valvecx: 'svg-ext-proceng-valvecx', tank1: 'svg-ext-proceng-tank1',
+    tank2: 'svg-ext-proceng-tank2', tank3: 'svg-ext-proceng-tank3',
+    exchheat: 'svg-ext-proceng-exchheat', exchfilter: 'svg-ext-proceng-exchfilter',
+    exchtube: 'svg-ext-proceng-exchtube', compfan: 'svg-ext-proceng-compfan',
+    comppiston: 'svg-ext-proceng-comppiston', compvoid: 'svg-ext-proceng-compvoid',
+    nozzle: 'svg-ext-proceng-nozzle', feeder: 'svg-ext-proceng-feeder',
+    'agitator-prop': 'svg-ext-proceng-agitator-prop', 'agitator-turbo': 'svg-ext-proceng-agitator-turbo',
+    'agitator-disc': 'svg-ext-proceng-agitator-disc', 'agitator-paddle': 'svg-ext-proceng-agitator-paddle',
+    centrifuge1: 'svg-ext-proceng-centrifuge1', crusher1: 'svg-ext-proceng-crusher1',
+    drier1: 'svg-ext-proceng-drier1', filter2: 'svg-ext-proceng-filter2',
+    webcam: 'svg-ext-proceng-webcam'
+};
 
 const TAG_SLOTS = ['value', 'visibility', 'blink', 'color', 'rotate'];
 
@@ -311,7 +434,14 @@ function descriptors() {
                     },
                     options: {
                         type: 'object',
-                        description: 'Gauge-specific display options.'
+                        description: 'Type-specific options. shapeName for svg-ext-shapes (rectangle, circle, diamond, triangle, pentagon, star, arrow, cloud, cylinder, heart, etc.) or svg-ext-proceng (centrifugal, motor, valveax, tank1, exchheat, compfan, nozzle, etc.) or svg-ext-ape (eli, piston). pipeWidth/contentWidth/content/border for pipe.',
+                        properties: {
+                            shapeName: { type: 'string', description: 'Shape subtype name (e.g. "rectangle", "centrifugal", "piston").' },
+                            pipeWidth: { type: 'number' },
+                            contentWidth: { type: 'number' },
+                            content: { type: 'string' },
+                            border: { type: 'string' }
+                        }
                     }
                 }
             }
@@ -586,7 +716,7 @@ function executors(ctx) {
         'view_add_gauge': async (args) => {
             const { svg, id: svgId } = buildSvg(
                 args.type, args.x, args.y, args.w, args.h,
-                args.fill, args.stroke, args.fontSize, args.text
+                args.fill, args.stroke, args.fontSize, args.text, args.options
             );
             const item = {
                 id: svgId,

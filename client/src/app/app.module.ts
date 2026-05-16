@@ -26,6 +26,7 @@ import { ViewComponent } from './view/view.component';
 import { LogsViewComponent } from './logs-view/logs-view.component';
 import { SidenavComponent } from './sidenav/sidenav.component';
 import { EditorComponent, DialogLinkProperty } from './editor/editor.component';
+import { DesignImportDialogComponent } from './editor/design-import-dialog/design-import-dialog.component';
 import { LayoutPropertyComponent } from './editor/layout-property/layout-property.component';
 import { AppSettingsComponent } from './editor/app-settings/app-settings.component';
 import { SetupComponent } from './editor/setup/setup.component';
@@ -107,6 +108,9 @@ import { FlexActionComponent } from './gauges/gauge-property/flex-action/flex-ac
 import { FlexActionsStandaloneComponent } from './gauges/gauge-property/flex-actions-standalone/flex-actions-standalone.component';
 import { FlexVariableComponent } from './gauges/gauge-property/flex-variable/flex-variable.component';
 import { MatSelectSearchModule } from './gui-helpers/mat-select-search/mat-select-search.module';
+import { AgentChatPanelComponent } from './agent/agent-chat-panel/agent-chat-panel.component';
+import { AgentSettingsTabComponent } from './agent/agent-settings-tab/agent-settings-tab.component';
+import { AgentSkillsTabComponent } from './agent/agent-skills-tab/agent-skills-tab.component';
 import { HtmlInputComponent } from './gauges/controls/html-input/html-input.component';
 import { HtmlButtonComponent } from './gauges/controls/html-button/html-button.component';
 import { HtmlSelectComponent } from './gauges/controls/html-select/html-select.component';
@@ -252,6 +256,9 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
 @NgModule({ declarations: [
         HomeComponent,
         EditorComponent,
+        AgentChatPanelComponent,
+        AgentSettingsTabComponent,
+        AgentSkillsTabComponent,
         HeaderComponent,
         SidenavComponent,
         IframeComponent,
@@ -286,6 +293,7 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
         FuxaViewDialogComponent,
         ViewPropertyComponent,
         DialogLinkProperty,
+        DesignImportDialogComponent,
         EditNameComponent,
         EditPlaceholderComponent,
         ConfirmDialogComponent,
