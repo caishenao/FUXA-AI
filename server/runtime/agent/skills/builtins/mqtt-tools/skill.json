@@ -1,0 +1,9 @@
+{
+    "name": "MQTT 工具集",
+    "slug": "mqtt-tools",
+    "version": "1.0.0",
+    "kind": "tool-pack",
+    "main": "index.js",
+    "description": "MQTT 连接、发布、订阅、设备发现",
+    "author": "frangoteam"
+}
